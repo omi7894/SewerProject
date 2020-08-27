@@ -7,17 +7,13 @@ import java.nio.charset.Charset;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.files.ShpFiles;
-import org.geotools.data.shapefile.shp.ShapefileException;
-import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 
 
-/**
- * Hello world!
- *
+/*
+ shapefile의 속성데이터중 Begin Depth 와 End Depth를 이용하여
+ 역방향으로 되어있는 하수도 갯수를 찾는다. 
  */
+
 public class Main_dbf
 {
     public static void main( String[] args ) throws Exception 
@@ -25,26 +21,23 @@ public class Main_dbf
     	DbaseFileReader r = null;
         try {
             ShpFiles shpFile = new ShpFiles
-            		("C:\\\\Users\\\\ETRI\\\\Desktop\\\\하수관로(SWL_PIPE_LM)\\\\SWL_PIPE_LM_Down3.dbf");
+            		("C:\\Users\\ETRI\\Desktop\\하수관로(SWL_PIPE_LM)\\SWL_PIPE_LM_Down3.dbf");
             r = new DbaseFileReader(shpFile, false, Charset.defaultCharset());
             
             DbaseFileHeader header = r.getHeader();
             
-            int i=0;
-            int rev=0;
+            int numOfData=0; //전체 데이터 갯수
+            int rev=0; //역방향 데이터 갯수
             while (r.hasNext()) {
                 Object[] values = r.readEntry();
-                double begin = (Double) r.readField(14);
-                double end = (Double) r.readField(15);
-              
+                double begin = (Double) values[14];
+                double end = (Double) values[15];
                 
-                System.out.println("속성 : " + begin+ "  "+end);
                 if(begin>end) {rev++;}
                 
-                System.out.println("---------------");
-                i++;
+                numOfData++;
             }
-            System.out.println("데이터 갯수 : "+i);
+            System.out.println("데이터 갯수 : "+numOfData);
             System.out.println("오류 데이터 갯수 : "+rev);
 
             r.close();
